@@ -1,5 +1,6 @@
 ﻿using AssetManagement.Models;
 using AssetManagement.Repository;
+using Microsoft.AspNetCore.Mvc;
 
 namespace AssetManagement.Service
 {
@@ -10,7 +11,7 @@ namespace AssetManagement.Service
         {
             _assetRepository = assetRepository;
         }
-        public async Task<IEnumerable<AssetDefinition>> GetAllAssetsService()
+        public async Task<ActionResult<IEnumerable<AssetDefinition>>> GetAllAssetsService()
         {
             return await _assetRepository.GetAllAssets();
         }

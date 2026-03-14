@@ -10,7 +10,7 @@ namespace AssetManagement.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class LoginController : Controller
+    public class LoginController : ControllerBase
     {
         private readonly ILoginService _loginService;
         private readonly IConfiguration _configuration;
@@ -39,20 +39,27 @@ namespace AssetManagement.Controllers
             return response;
         }
         [HttpPost]
-        public async Task<IActionResult> Register(Login login)
+        [Route("RegisterLogin")]
+        public async Task<Login> Register(Login login)
         {
-            IActionResult response = BadRequest();
-            Login regUser = null;
-            regUser = await _loginService.RegisterLogin(login);
-            if (regUser != null)
+            if (_loginService != null)
             {
-                response = Ok(new
-                {
-                    Username = regUser.UserName,
-                    userTypeType = regUser.UserTypeId,
-                });
+                return await _loginService.RegisterLogin(login);
+                
             }
-            return response;
+
+            return null;
+        }
+        [HttpPost]
+        [Route("RegisterUser")]
+        public async Task<User> RegisterUsers(User user)
+        {
+
+            if (_loginService != null)
+            {
+                return await _loginService.RegisterUser(user);
+            }
+            return null;
         }
         private string GenerateJSONWebToken(Login DbUser)
         {
@@ -61,8 +68,9 @@ namespace AssetManagement.Controllers
             //2 define Alogorithm
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
             //3 Jwt token --payload
-            var token = new JwtSecurityToken(_configuration["Jwt:Issuer"],
-              _configuration["Jwt:Issuer"],
+            var token = new JwtSecurityToken(
+    issuer: _configuration["Jwt:Issuer"],
+    audience: _configuration["Jwt:Audience"],
               null,
               expires: DateTime.Now.AddMinutes(20),
               signingCredentials: credentials);

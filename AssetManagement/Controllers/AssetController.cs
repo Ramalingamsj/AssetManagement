@@ -1,5 +1,6 @@
 ﻿using AssetManagement.Models;
 using AssetManagement.Service;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 
@@ -17,6 +18,7 @@ namespace AssetManagement.Controllers
         }
 
         [HttpGet]
+        [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<ActionResult<IEnumerable<AssetDefinition>>> GetAllAssets()
         {
             return await _assetService.GetAllAssetsService();
@@ -35,7 +37,8 @@ namespace AssetManagement.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateAssetDefinition(int id, [FromBody] AssetDefinition assetDefinition)
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        public async Task<IActionResult> UpdateAssetDefinition(int id,  AssetDefinition assetDefinition)
         {
             if (!ModelState.IsValid)
             {

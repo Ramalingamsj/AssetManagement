@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace AssetManagement.Models;
 
@@ -14,6 +15,6 @@ public partial class Login
     public int? UserTypeId { get; set; }
 
     public virtual UserType? UserType { get; set; }
-
+    [JsonIgnore]
     public virtual ICollection<User> Users { get; set; } = new List<User>();
 }

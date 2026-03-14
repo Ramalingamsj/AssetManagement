@@ -1,4 +1,5 @@
 ﻿using AssetManagement.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace AssetManagement.Repository
@@ -10,11 +11,13 @@ namespace AssetManagement.Repository
         {
             _context = context;
         }
-        public async Task<IEnumerable<AssetDefinition>> GetAllAssets()
+        public async Task<ActionResult<IEnumerable<AssetDefinition>>> GetAllAssets()
         {
             if(_context != null)
             {
-                return await _context.AssetDefinitions.ToListAsync();
+                return await _context.AssetDefinitions
+                    .Include(e => e.AssetType)
+                    .ToListAsync();
             }
             return null;
         }
@@ -24,7 +27,10 @@ namespace AssetManagement.Repository
            if(_context != null)
             {
                 var asset = await _context.AssetDefinitions.AddAsync(assetDefinition);
-                await _context.SaveChangesAsync();  
+                await _context.SaveChangesAsync();
+                var AssetDId = await _context.AssetDefinitions
+                   .Include(e => e.AssetType)
+                   .FirstOrDefaultAsync(e => e.AssetTypeId == assetDefinition.AssetTypeId);
                 return assetDefinition;
             }
             return null;
@@ -47,6 +53,10 @@ namespace AssetManagement.Repository
             //Update th xisting employee with the values
             _context.Entry(existingAsset).CurrentValues.SetValues(assetDefinition);
             await _context.SaveChangesAsync();
+
+            var AssetDId = await _context.AssetDefinitions
+                    .Include(e => e.AssetType)
+                    .FirstOrDefaultAsync(e => e.AssetTypeId == assetDefinition.AssetTypeId);
 
             return existingAsset;
         }
